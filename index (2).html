@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyTick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F7F1;
+    --paper-line: rgba(34,48,60,0.07);
+    --ink:#22303C;
+    --ink-soft:#5B6B74;
+    --coral:#FF6B5B;
+    --coral-dark:#E5503F;
+    --sun:#FFC94D;
+    --sky:#4EA8DE;
+    --grape:#8B7CF6;
+    --mint:#3DDC97;
+    --card:#FFFFFF;
+    --line: rgba(34,48,60,0.12);
+    --shadow: 0 2px 0 rgba(34,48,60,0.08), 0 8px 20px -10px rgba(34,48,60,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 28px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    min-height:100vh;
+    padding:20px 16px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  /* Header */
+  header{
+    display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+    gap:12px; margin-bottom:18px; padding-bottom:14px; border-bottom:2px dashed var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:46px;height:46px;border-radius:12px;background:var(--coral);
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+    transform:rotate(-6deg); box-shadow:var(--shadow);
+  }
+  h1{font-family:'Baloo 2',sans-serif; font-size:26px; font-weight:800; margin:0; line-height:1;}
+  .tagline{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+  .date-chip{
+    font-family:'Space Mono',monospace; font-size:12px; background:var(--card);
+    border:1.5px solid var(--line); border-radius:999px; padding:7px 14px;
+    box-shadow:var(--shadow);
+  }
+
+  /* Quote banner */
+  .quote{
+    background: var(--grape); color:#fff; border-radius:16px; padding:14px 18px;
+    font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; margin-bottom:20px;
+    display:flex; align-items:center; gap:10px; box-shadow:var(--shadow);
+    transform:rotate(-0.4deg);
+  }
+  .quote .emoji{font-size:20px;}
+
+  /* Grid */
+  .grid{display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:16px;}
+  @media(max-width:720px){.grid{grid-template-columns:1fr;}}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;}
+  @media(max-width:720px){.grid3{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--card); border-radius:18px; padding:18px;
+    box-shadow:var(--shadow); border:1.5px solid var(--line);
+    position:relative; overflow:hidden;
+  }
+  .tape{
+    position:absolute; top:-8px; left:22px; width:64px; height:20px;
+    border-radius:3px; transform:rotate(-4deg); opacity:0.85;
+  }
+  .card h2{
+    font-family:'Baloo 2',sans-serif; font-size:17px; margin:6px 0 14px; display:flex; align-items:center; gap:8px;
+  }
+  .card h2 .ico{font-size:19px;}
+
+  /* Tasks */
+  .task-row{
+    display:flex; align-items:center; gap:10px; padding:9px 4px;
+    border-bottom:1px dashed var(--line);
+  }
+  .task-row:last-of-type{border-bottom:none;}
+  .tick-box{
+    width:24px;height:24px;border-radius:7px;border:2px solid var(--coral);
+    flex:0 0 auto; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:#fff; background:transparent; transition:.15s;
+  }
+  .tick-box.done{background:var(--coral); }
+  .task-text{flex:1; font-size:14px;}
+  .task-text.done{text-decoration:line-through; color:var(--ink-soft);}
+  .task-subj{
+    font-family:'Space Mono',monospace; font-size:10px; background:var(--paper);
+    border:1px solid var(--line); border-radius:6px; padding:2px 6px; color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .del-btn{
+    border:none;background:none;color:var(--ink-soft);cursor:pointer;font-size:15px;opacity:.5;
+    padding:2px 4px;
+  }
+  .del-btn:hover{opacity:1;color:var(--coral-dark);}
+  .add-row{display:flex; gap:6px; margin-top:12px; flex-wrap:wrap;}
+  input[type=text], textarea, input[type=number]{
+    font-family:'Plus Jakarta Sans',sans-serif; border:1.5px solid var(--line);
+    border-radius:10px; padding:9px 11px; font-size:13px; background:var(--paper);
+    color:var(--ink);
+  }
+  input[type=text]:focus, textarea:focus{outline:2px solid var(--sky); outline-offset:1px;}
+  .subj-select{
+    font-family:'Plus Jakarta Sans',sans-serif; border:1.5px solid var(--line);
+    border-radius:10px; padding:9px 8px; font-size:13px; background:var(--paper); color:var(--ink);
+  }
+  #new-task-text{flex:1; min-width:120px;}
+  .btn{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; border:none;
+    border-radius:10px; padding:9px 16px; cursor:pointer; color:#fff; background:var(--coral);
+    box-shadow:0 2px 0 var(--coral-dark);
+  }
+  .btn:active{transform:translateY(2px); box-shadow:none;}
+  .btn.sky{background:var(--sky); box-shadow:0 2px 0 #3a86b8;}
+  .btn.grape{background:var(--grape); box-shadow:0 2px 0 #6c5ce0;}
+  .empty{color:var(--ink-soft); font-size:13px; font-style:italic; padding:6px 0;}
+
+  /* Progress ring */
+  .prog-wrap{display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .ring{width:120px;height:120px; position:relative;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring-num{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:'Space Mono',monospace;
+  }
+  .ring-num b{font-size:26px;}
+  .ring-num span{font-size:10px; color:var(--ink-soft);}
+  .prog-sub{font-size:12px; color:var(--ink-soft); margin-top:8px; text-align:center;}
+
+  /* Mood */
+  .mood-grid{display:flex; justify-content:space-between; gap:6px;}
+  .mood-btn{
+    flex:1; border:2px solid transparent; background:var(--paper); border-radius:12px;
+    padding:8px 0; font-size:22px; cursor:pointer; transition:.15s;
+  }
+  .mood-btn.sel{border-color:var(--sun); background:#FFF6E0; transform:translateY(-2px);}
+  .mood-label{text-align:center; font-size:11px; color:var(--ink-soft); margin-top:6px;}
+
+  /* Streak */
+  .streak-flex{display:flex; align-items:center; gap:14px;}
+  .flame{
+    font-size:38px; filter:drop-shadow(0 3px 0 rgba(0,0,0,0.05));
+  }
+  .streak-num{font-family:'Baloo 2',sans-serif; font-size:30px; font-weight:800; color:var(--coral-dark); line-height:1;}
+  .streak-days{display:flex; gap:4px; margin-top:10px;}
+  .sd{width:16px;height:16px;border-radius:5px; background:var(--paper); border:1.5px solid var(--line);}
+  .sd.on{background:var(--sun); border-color:#E0AA2E;}
+
+  /* Badges */
+  .badge-grid{display:flex; flex-wrap:wrap; gap:10px;}
+  .badge{
+    width:78px; text-align:center; opacity:.35; filter:grayscale(1);
+  }
+  .badge.unlocked{opacity:1; filter:none;}
+  .badge .bico{
+    width:52px;height:52px;border-radius:50%; background:var(--grape); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-size:22px; margin:0 auto 6px;
+    box-shadow:var(--shadow);
+  }
+  .badge .blabel{font-size:10px; line-height:1.2; color:var(--ink-soft);}
+
+  /* Schedule */
+  .sched-row{
+    display:flex; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px dashed var(--line);
+  }
+  .sched-row:last-of-type{border-bottom:none;}
+  .sched-time{
+    font-family:'Space Mono',monospace; font-size:12px; background:var(--paper); border:1px solid var(--line);
+    border-radius:6px; padding:3px 7px; flex:0 0 auto;
+  }
+  .sched-type{
+    width:10px;height:10px;border-radius:50%; flex:0 0 auto;
+  }
+  .sched-label{flex:1; font-size:13px;}
+
+  /* Goal */
+  .goal-bar-bg{background:var(--paper); border-radius:999px; height:14px; border:1.5px solid var(--line); overflow:hidden; margin-top:10px;}
+  .goal-bar-fill{background:var(--mint); height:100%; border-radius:999px; transition:width .3s;}
+  .goal-text{font-size:14px; margin-top:8px;}
+  .goal-controls{display:flex; align-items:center; gap:8px; margin-top:10px;}
+
+  /* Weekly report */
+  .bars{display:flex; align-items:flex-end; gap:10px; height:110px; padding-top:10px;}
+  .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .bar-track{width:100%; height:80px; background:var(--paper); border-radius:8px 8px 4px 4px; display:flex; align-items:flex-end; border:1px solid var(--line);}
+  .bar-fill{width:100%; background:var(--sky); border-radius:8px 8px 0 0; transition:height .3s;}
+  .bar-day{font-size:10px; color:var(--ink-soft); font-family:'Space Mono',monospace;}
+
+  /* Stamp animation */
+  .stamp{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.5) rotate(-18deg);
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:44px; color:var(--coral);
+    border:6px solid var(--coral); border-radius:16px; padding:10px 26px;
+    opacity:0; pointer-events:none; z-index:50; background:rgba(255,255,255,0.85);
+  }
+  .stamp.go{
+    animation:stampin .7s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  @keyframes stampin{
+    0%{opacity:0; transform:translate(-50%,-50%) scale(0.4) rotate(-18deg);}
+    35%{opacity:1; transform:translate(-50%,-50%) scale(1.08) rotate(-10deg);}
+    55%{transform:translate(-50%,-50%) scale(1) rotate(-10deg);}
+    100%{opacity:0; transform:translate(-50%,-50%) scale(1) rotate(-10deg);}
+  }
+
+  textarea{width:100%; resize:vertical; min-height:70px; font-size:13px;}
+  .save-note{font-size:11px; color:var(--ink-soft); margin-top:6px;}
+
+  ::selection{background:var(--sun);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">✅</div>
+      <div>
+        <h1>StudyTick</h1>
+        <div class="tagline">Siapkan tugas, Tick kejayaan!</div>
+      </div>
+    </div>
+    <div class="date-chip" id="date-chip">—</div>
+  </header>
+
+  <div class="quote" id="quote-banner">
+    <span class="emoji">💡</span>
+    <span id="quote-text">Memuatkan semangat hari ini…</span>
+  </div>
+
+  <div class="grid">
+    <!-- Tugasan -->
+    <div class="card">
+      <div class="tape" style="background:var(--coral);"></div>
+      <h2><span class="ico">📌</span> Tugasan Hari Ini</h2>
+      <div id="task-list"></div>
+      <div class="add-row">
+        <select class="subj-select" id="new-task-subj">
+          <option>Matematik</option>
+          <option>Bahasa Melayu</option>
+          <option>Sains</option>
+          <option>Bahasa Inggeris</option>
+          <option>Sejarah</option>
+          <option>Lain-lain</option>
+        </select>
+        <input type="text" id="new-task-text" placeholder="cth: Latihan Bab 3" maxlength="60">
+        <button class="btn" id="add-task-btn">+ Tambah</button>
+      </div>
+    </div>
+
+    <!-- Progres -->
+    <div class="card">
+      <div class="tape" style="background:var(--mint);"></div>
+      <h2><span class="ico">📊</span> Progres Harian</h2>
+      <div class="prog-wrap">
+        <div class="ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" stroke="var(--paper)" stroke-width="12" fill="none"/>
+            <circle id="ring-fill" cx="60" cy="60" r="52" stroke="var(--mint)" stroke-width="12" fill="none"
+              stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div class="ring-num"><b id="prog-pct">0%</b><span id="prog-frac">0/0</span></div>
+        </div>
+        <div class="prog-sub">Tugasan siap hari ini</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <!-- Emosi -->
+    <div class="card">
+      <div class="tape" style="background:var(--sun);"></div>
+      <h2><span class="ico">😊</span> Emosi Hari Ini</h2>
+      <div class="mood-grid" id="mood-grid"></div>
+    </div>
+
+    <!-- Streak -->
+    <div class="card">
+      <div class="tape" style="background:var(--sky);"></div>
+      <h2><span class="ico">🔥</span> Streak Belajar</h2>
+      <div class="streak-flex">
+        <div class="flame">🔥</div>
+        <div>
+          <div class="streak-num" id="streak-num">0</div>
+          <div style="font-size:11px;color:var(--ink-soft);">hari berturut-turut</div>
+        </div>
+      </div>
+      <div class="streak-days" id="streak-days"></div>
+    </div>
+
+    <!-- Matlamat -->
+    <div class="card">
+      <div class="tape" style="background:var(--grape);"></div>
+      <h2><span class="ico">🎯</span> Matlamat Minggu</h2>
+      <div class="goal-text" id="goal-text">Belum ada matlamat</div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-fill" style="width:0%"></div></div>
+      <div class="goal-controls">
+        <input type="text" id="goal-input" placeholder="cth: Siapkan 5 tugasan" style="flex:1;">
+        <input type="number" id="goal-target" placeholder="5" min="1" max="99" style="width:56px;">
+        <button class="btn grape" id="goal-btn">Tetap</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Jadual -->
+    <div class="card">
+      <div class="tape" style="background:var(--sky);"></div>
+      <h2><span class="ico">⏰</span> Jadual Belajar</h2>
+      <div id="sched-list"></div>
+      <div class="add-row">
+        <input type="text" id="sched-time" placeholder="8:00 PM" style="width:90px;">
+        <input type="text" id="sched-label" placeholder="cth: Ulang kaji Sains" style="flex:1; min-width:120px;">
+        <select class="subj-select" id="sched-type">
+          <option value="var(--sky)">Belajar</option>
+          <option value="var(--mint)">Rehat</option>
+          <option value="var(--sun)">Aktiviti</option>
+        </select>
+        <button class="btn sky" id="sched-btn">+ Tambah</button>
+      </div>
+    </div>
+
+    <!-- Pencapaian -->
+    <div class="card">
+      <div class="tape" style="background:var(--coral);"></div>
+      <h2><span class="ico">🏆</span> Pencapaian</h2>
+      <div class="badge-grid" id="badge-grid"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Perbaiki Diri -->
+    <div class="card">
+      <div class="tape" style="background:var(--sun);"></div>
+      <h2><span class="ico">📝</span> Perbaiki Diri</h2>
+      <textarea id="improve-text" placeholder="Apa yang boleh diperbaiki hari ini?" maxlength="200"></textarea>
+      <div class="save-note" id="improve-save-note">Disimpan automatik</div>
+    </div>
+
+    <!-- Laporan Mingguan -->
+    <div class="card">
+      <div class="tape" style="background:var(--mint);"></div>
+      <h2><span class="ico">📈</span> Laporan Mingguan</h2>
+      <div class="bars" id="report-bars"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="stamp" id="stamp">SIAP! ✓</div>
+
+<script>
+(function(){
+  const MOODS = [
+    {e:'😄', l:'Gembira'}, {e:'😐', l:'Biasa'}, {e:'😔', l:'Sedih'},
+    {e:'😫', l:'Penat'}, {e:'😡', l:'Marah'}
+  ];
+  const QUOTES = [
+    'Sikit-sikit, lama-lama jadi bukit. Teruskan usaha! 💪',
+    'Setiap tugasan yang siap adalah satu kemenangan kecil. 🌟',
+    'Rehat itu penting, tapi jangan lupa sasaran awak. 🎯',
+    'Hari ini penat, esok lagi kuat. Jangan give up! 🔥',
+    'Belajar bukan tentang laju, tapi tentang konsisten. ⏳',
+    'Awak dah datang jauh. Sikit lagi je! ✅',
+    'Kesilapan hari ini adalah pelajaran untuk esok. 📘',
+    'Fokus 10 minit lebih baik dari scroll phone 1 jam. 📵'
+  ];
+  const BADGES = [
+    {id:'first', icon:'🥇', label:'Tugasan Pertama', cond:d=>d.totalDone>=1},
+    {id:'ten', icon:'📚', label:'10 Tugasan Siap', cond:d=>d.totalDone>=10},
+    {id:'streak3', icon:'🔥', label:'Streak 3 Hari', cond:d=>d.streak>=3},
+    {id:'streak7', icon:'⭐', label:'Streak 7 Hari', cond:d=>d.streak>=7},
+    {id:'goal', icon:'🏆', label:'Matlamat Dicapai', cond:d=>d.goal && d.goal.current>=d.goal.target && d.goal.target>0},
+  ];
+  const SUBJ_ICON = {'Matematik':'➗','Bahasa Melayu':'📖','Sains':'🔬','Bahasa Inggeris':'🔤','Sejarah':'🏛️','Lain-lain':'📌'};
+
+  function todayKey(offset){
+    const d = new Date();
+    d.setDate(d.getDate() + (offset||0));
+    return d.toISOString().slice(0,10);
+  }
+  function fmtDateMY(key){
+    const bulan = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+    const [y,m,d] = key.split('-').map(Number);
+    return `${d} ${bulan[m-1]} ${y}`;
+  }
+
+  let data = { days:{}, schedule:[], goal:{text:'',target:0,current:0}, badges:[] };
+  const TODAY = todayKey(0);
+
+  function ensureDay(key){
+    if(!data.days[key]) data.days[key] = { tasks:[], mood:null, improve:'' };
+    return data.days[key];
+  }
+
+  async function load(){
+    try{
+      const res = await window.storage.get('studytick-data', false);
+      if(res && res.value) data = JSON.parse(res.value);
+    }catch(e){ /* no data yet */ }
+    ensureDay(TODAY);
+    if(!data.goal) data.goal = {text:'',target:0,current:0};
+    render();
+  }
+  let saveTimeout;
+  async function save(){
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(async ()=>{
+      try{ await window.storage.set('studytick-data', JSON.stringify(data), false); }
+      catch(e){ console.error('Gagal simpan', e); }
+    }, 250);
+  }
+
+  function computeStreak(){
+    let streak = 0;
+    for(let i=0;i<365;i++){
+      const key = todayKey(-i);
+      const day = data.days[key];
+      const done = day && day.tasks && day.tasks.some(t=>t.done);
+      if(done){ streak++; } else { if(i===0) continue; break; }
+    }
+    return streak;
+  }
+  function totalDone(){
+    let n=0;
+    Object.values(data.days).forEach(d=> d.tasks.forEach(t=> t.done && n++));
+    return n;
+  }
+
+  function renderTasks(){
+    const day = ensureDay(TODAY);
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+    if(day.tasks.length===0){
+      list.innerHTML = '<div class="empty">Belum ada tugasan. Tambah satu di bawah! ✍️</div>';
+    }
+    day.tasks.forEach(t=>{
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <div class="tick-box ${t.done?'done':''}" data-id="${t.id}">${t.done?'✓':''}</div>
+        <span class="task-subj">${SUBJ_ICON[t.subj]||'📌'} ${t.subj}</span>
+        <span class="task-text ${t.done?'done':''}">${t.text}</span>
+        <button class="del-btn" data-del="${t.id}">✕</button>
+      `;
+      list.appendChild(row);
+    });
+    list.querySelectorAll('.tick-box').forEach(el=>{
+      el.addEventListener('click', ()=>toggleTask(el.dataset.id));
+    });
+    list.querySelectorAll('[data-del]').forEach(el=>{
+      el.addEventListener('click', ()=>deleteTask(el.dataset.del));
+    });
+
+    const doneCount = day.tasks.filter(t=>t.done).length;
+    const pct = day.tasks.length ? Math.round(doneCount/day.tasks.length*100) : 0;
+    document.getElementById('prog-pct').textContent = pct+'%';
+    document.getElementById('prog-frac').textContent = `${doneCount}/${day.tasks.length}`;
+    const circumference = 326.7;
+    document.getElementById('ring-fill').style.strokeDashoffset = circumference - (circumference*pct/100);
+  }
+
+  function toggleTask(id){
+    const day = ensureDay(TODAY);
+    const t = day.tasks.find(t=>t.id===id);
+    if(!t) return;
+    t.done = !t.done;
+    if(t.done) showStamp();
+    afterChange();
+  }
+  function deleteTask(id){
+    const day = ensureDay(TODAY);
+    day.tasks = day.tasks.filter(t=>t.id!==id);
+    afterChange();
+  }
+  function showStamp(){
+    const el = document.getElementById('stamp');
+    el.classList.remove('go'); void el.offsetWidth;
+    el.classList.add('go');
+  }
+
+  function renderMood(){
+    const day = ensureDay(TODAY);
+    const grid = document.getElementById('mood-grid');
+    grid.innerHTML = '';
+    MOODS.forEach(m=>{
+      const btn = document.createElement('div');
+      btn.style.flex='1'; btn.style.textAlign='center';
+      btn.innerHTML = `<button class="mood-btn ${day.mood===m.e?'sel':''}" data-mood="${m.e}">${m.e}</button>
+        <div class="mood-label">${m.l}</div>`;
+      grid.appendChild(btn);
+    });
+    grid.querySelectorAll('.mood-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const day = ensureDay(TODAY);
+        day.mood = b.dataset.mood;
+        afterChange();
+      });
+    });
+  }
+
+  function renderStreak(){
+    const streak = computeStreak();
+    document.getElementById('streak-num').textContent = streak;
+    const dots = document.getElementById('streak-days');
+    dots.innerHTML = '';
+    for(let i=6;i>=0;i--){
+      const key = todayKey(-i);
+      const day = data.days[key];
+      const on = day && day.tasks.some(t=>t.done);
+      const d = document.createElement('div');
+      d.className = 'sd'+(on?' on':'');
+      dots.appendChild(d);
+    }
+    return streak;
+  }
+
+  function renderGoal(){
+    const g = data.goal;
+    const doneToday = totalDoneThisWeek();
+    g.current = doneToday;
+    const gt = document.getElementById('goal-text');
+    gt.textContent = g.text ? `${g.text} (${g.current}/${g.target})` : 'Belum ada matlamat';
+    const pct = g.target ? Math.min(100, Math.round(g.current/g.target*100)) : 0;
+    document.getElementById('goal-fill').style.width = pct+'%';
+  }
+  function totalDoneThisWeek(){
+    const now = new Date();
+    const day = now.getDay();
+    const mondayOffset = (day===0? -6 : 1-day);
+    const monday = new Date(now); monday.setDate(now.getDate()+mondayOffset);
+    let n=0;
+    for(let i=0;i<7;i++){
+      const d = new Date(monday); d.setDate(monday.getDate()+i);
+      const key = d.toISOString().slice(0,10);
+      const dd = data.days[key];
+      if(dd) n += dd.tasks.filter(t=>t.done).length;
+    }
+    return n;
+  }
+
+  function renderSchedule(){
+    const list = document.getElementById('sched-list');
+    list.innerHTML = '';
+    if(data.schedule.length===0){
+      list.innerHTML = '<div class="empty">Belum ada jadual. Tetapkan masa belajar/rehat di bawah.</div>';
+    }
+    data.schedule.forEach(s=>{
+      const row = document.createElement('div');
+      row.className = 'sched-row';
+      row.innerHTML = `
+        <span class="sched-time">${s.time}</span>
+        <span class="sched-type" style="background:${s.type}"></span>
+        <span class="sched-label">${s.label}</span>
+        <button class="del-btn" data-sdel="${s.id}">✕</button>
+      `;
+      list.appendChild(row);
+    });
+    list.querySelectorAll('[data-sdel]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        data.schedule = data.schedule.filter(s=>s.id!==el.dataset.sdel);
+        afterChange();
+      });
+    });
+  }
+
+  function renderBadges(){
+    const ctx = { totalDone: totalDone(), streak: computeStreak(), goal: data.goal };
+    const grid = document.getElementById('badge-grid');
+    grid.innerHTML = '';
+    BADGES.forEach(b=>{
+      const unlocked = b.cond(ctx);
+      const el = document.createElement('div');
+      el.className = 'badge'+(unlocked?' unlocked':'');
+      el.innerHTML = `<div class="bico">${b.icon}</div><div class="blabel">${b.label}</div>`;
+      grid.appendChild(el);
+    });
+  }
+
+  function renderReport(){
+    const bars = document.getElementById('report-bars');
+    bars.innerHTML = '';
+    const dayNames = ['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'];
+    for(let i=6;i>=0;i--){
+      const key = todayKey(-i);
+      const d = data.days[key];
+      const total = d ? d.tasks.length : 0;
+      const done = d ? d.tasks.filter(t=>t.done).length : 0;
+      const pct = total ? Math.round(done/total*100) : 0;
+      const dow = new Date(key+'T00:00:00').getDay();
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      col.innerHTML = `
+        <div style="font-size:10px;color:var(--ink-soft);font-family:'Space Mono',monospace;">${pct}%</div>
+        <div class="bar-track"><div class="bar-fill" style="height:${pct}%"></div></div>
+        <div class="bar-day">${dayNames[dow]}</div>
+      `;
+      bars.appendChild(col);
+    }
+  }
+
+  function renderImprove(){
+    const day = ensureDay(TODAY);
+    const ta = document.getElementById('improve-text');
+    if(document.activeElement !== ta) ta.value = day.improve || '';
+  }
+
+  function renderQuote(){
+    const idx = Math.abs(hashCode(TODAY)) % QUOTES.length;
+    document.getElementById('quote-text').textContent = QUOTES[idx];
+  }
+  function hashCode(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return h; }
+
+  function render(){
+    document.getElementById('date-chip').textContent = '📅 ' + fmtDateMY(TODAY);
+    renderQuote();
+    renderTasks();
+    renderMood();
+    renderStreak();
+    renderGoal();
+    renderSchedule();
+    renderBadges();
+    renderReport();
+    renderImprove();
+  }
+
+  function afterChange(){
+    render();
+    save();
+  }
+
+  // Event bindings
+  document.getElementById('add-task-btn').addEventListener('click', ()=>{
+    const subj = document.getElementById('new-task-subj').value;
+    const textInput = document.getElementById('new-task-text');
+    const text = textInput.value.trim();
+    if(!text) return;
+    const day = ensureDay(TODAY);
+    day.tasks.push({ id: 't'+Date.now()+Math.random().toString(36).slice(2,6), subj, text, done:false });
+    textInput.value = '';
+    afterChange();
+  });
+  document.getElementById('new-task-text').addEventListener('keydown', e=>{
+    if(e.key==='Enter') document.getElementById('add-task-btn').click();
+  });
+
+  document.getElementById('sched-btn').addEventListener('click', ()=>{
+    const time = document.getElementById('sched-time').value.trim();
+    const label = document.getElementById('sched-label').value.trim();
+    const type = document.getElementById('sched-type').value;
+    if(!time || !label) return;
+    data.schedule.push({ id:'s'+Date.now(), time, label, type });
+    data.schedule.sort((a,b)=> a.time.localeCompare(b.time));
+    document.getElementById('sched-time').value='';
+    document.getElementById('sched-label').value='';
+    afterChange();
+  });
+
+  document.getElementById('goal-btn').addEventListener('click', ()=>{
+    const text = document.getElementById('goal-input').value.trim();
+    const target = parseInt(document.getElementById('goal-target').value) || 0;
+    if(!text || !target) return;
+    data.goal = { text, target, current:0 };
+    document.getElementById('goal-input').value='';
+    document.getElementById('goal-target').value='';
+    afterChange();
+  });
+
+  let improveTimeout;
+  document.getElementById('improve-text').addEventListener('input', (e)=>{
+    const day = ensureDay(TODAY);
+    day.improve = e.target.value;
+    document.getElementById('improve-save-note').textContent = 'Menyimpan…';
+    clearTimeout(improveTimeout);
+    improveTimeout = setTimeout(()=>{
+      save();
+      document.getElementById('improve-save-note').textContent = 'Disimpan automatik ✓';
+    }, 500);
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
